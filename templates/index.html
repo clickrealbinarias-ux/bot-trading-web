@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot de Trading - Sistema de Copytrading</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .role-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .role-card {
+            background: linear-gradient(135deg, #e8f0fe 0%, #f0f8ff 100%);
+            padding: 30px;
+            border-radius: 15px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .role-card:hover {
+            border-color: #1a73e8;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(26, 115, 232, 0.3);
+        }
+        
+        .role-card h3 {
+            color: #1a73e8;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+        
+        .role-card p {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+        
+        .features {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+        
+        .features ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .features li {
+            padding: 5px 0;
+            color: #666;
+        }
+        
+        .features li:before {
+            content: "✓ ";
+            color: #1a73e8;
+            font-weight: bold;
+        }
+        
+        .login-form {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #1a73e8;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #1a73e8 0%, #1557b0 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(26, 115, 232, 0.4);
+        }
+        
+        .dashboard {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+        
+        .status-card {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .error-card {
+            background: #ffebee;
+            color: #c62828;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .panel {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .panel h3 {
+            color: #1a73e8;
+            margin-bottom: 15px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #1a73e8;
+        }
+        
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .role-selection {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Bot de Trading</h1>
+            <p>Sistema de Copytrading Web Profesional</p>
+        </div>
+        
+        <div class="main-content">
+            <!-- Selección de rol -->
+            <div id="role-selection">
+                <div class="role-card" onclick="selectRole('trader')">
+                    <h3>👨‍💼 Trader Principal</h3>
+                    <p>Eres un trader profesional que quiere que otros copien tus operaciones</p>
+                    <div class="features">
+                        <ul>
+                            <li>Gestionar usuarios autorizados</li>
+                            <li>Monitorear operaciones en tiempo real</li>
+                            <li>Configurar parámetros de trading</li>
+                            <li>Ver estadísticas de seguidores</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="role-card" onclick="selectRole('follower')">
+                    <h3>👥 Seguidor</h3>
+                    <p>Quieres copiar automáticamente las operaciones de traders exitosos</p>
+                    <div class="features">
+                        <ul>
+                            <li>Ver operaciones en tiempo real</li>
+                            <li>Recibir notificaciones de trading</li>
+                            <li>Configurar parámetros de seguimiento</li>
+                            <li>Ver historial de operaciones</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Formulario de login -->
+            <div id="login-form" class="login-form hidden">
+                <h2>Iniciar Sesión</h2>
+                <form onsubmit="login(event)">
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input type="email" id="email" required placeholder="tu@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Contraseña:</label>
+                        <input type="password" id="password" required placeholder="Tu contraseña">
+                    </div>
+                    <div class="form-group">
+                        <label>Rol:</label>
+                        <select id="role" required>
+                            <option value="">Selecciona tu rol</option>
+                            <option value="trader">Trader Principal</option>
+                            <option value="follower">Seguidor</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn">🚀 Iniciar Sesión</button>
+                </form>
+            </div>
+            
+            <!-- Dashboard -->
+            <div id="dashboard" class="dashboard hidden">
+                <div id="user-info"></div>
+                
+                <!-- Panel de Trader -->
+                <div id="trader-panel" class="panel hidden">
+                    <h3>👨‍💼 Panel de Trader</h3>
+                    <div class="stats">
+                        <div class="stat-card">
+                            <div class="stat-number" id="followers-count">0</div>
+                            <div class="stat-label">Seguidores</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="operations-count">0</div>
+                            <div class="stat-label">Operaciones</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="online-users">0</div>
+                            <div class="stat-label">Usuarios Online</div>
+                        </div>
+                    </div>
+                    
+                    <h4>Gestión de Usuarios</h4>
+                    <div class="form-group">
+                        <label>Agregar usuario autorizado:</label>
+                        <input type="email" id="new-user-email" placeholder="email@ejemplo.com">
+                        <button type="button" class="btn" onclick="addUser()" style="margin-top: 10px;">Agregar Usuario</button>
+                    </div>
+                    
+                    <h4>Usuarios Autorizados:</h4>
+                    <div id="authorized-users-list"></div>
+                </div>
+                
+                <!-- Panel de Seguidor -->
+                <div id="follower-panel" class="panel hidden">
+                    <h3>👥 Panel de Seguidor</h3>
+                    <div class="stats">
+                        <div class="stat-card">
+                            <div class="stat-number" id="followed-operations">0</div>
+                            <div class="stat-label">Operaciones Seguidas</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="success-rate">0%</div>
+                            <div class="stat-label">Tasa de Éxito</div>
+                        </div>
+                    </div>
+                    
+                    <h4>Operaciones en Tiempo Real</h4>
+                    <div id="operations-feed"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+    <script>
+        let selectedRole = '';
+        let currentUser = null;
+        let socket = null;
+        
+        function selectRole(role) {
+            selectedRole = role;
+            document.getElementById('role-selection').classList.add('hidden');
+            document.getElementById('login-form').classList.remove('hidden');
+            document.getElementById('role').value = role;
+        }
+        
+        async function login(event) {
+            event.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const role = document.getElementById('role').value;
+            
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password, role })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentUser = { email, role, user_id: data.user_id };
+                    
+                    // Conectar WebSocket
+                    socket = io();
+                    socket.emit('join_room', { room: role });
+                    
+                    // Mostrar dashboard
+                    document.getElementById('login-form').classList.add('hidden');
+                    document.getElementById('dashboard').classList.remove('hidden');
+                    
+                    // Mostrar panel según rol
+                    if (role === 'trader') {
+                        document.getElementById('trader-panel').classList.remove('hidden');
+                        loadAuthorizedUsers();
+                    } else {
+                        document.getElementById('follower-panel').classList.remove('hidden');
+                    }
+                    
+                    // Mostrar info del usuario
+                    document.getElementById('user-info').innerHTML = 
+                        `<div class="status-card">
+                            <strong>✅ Usuario:</strong> ${email} <strong>Rol:</strong> ${role}
+                        </div>`;
+                    
+                    // Cargar estadísticas
+                    loadStats();
+                    
+                } else {
+                    document.getElementById('user-info').innerHTML = 
+                        `<div class="error-card">
+                            <strong>❌ Error:</strong> ${data.error}
+                        </div>`;
+                }
+            } catch (error) {
+                document.getElementById('user-info').innerHTML = 
+                    `<div class="error-card">
+                        <strong>❌ Error de conexión:</strong> ${error.message}
+                    </div>`;
+            }
+        }
+        
+        async function loadAuthorizedUsers() {
+            try {
+                const response = await fetch('/api/admin/authorized-users', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email: currentUser.email })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const usersList = document.getElementById('authorized-users-list');
+                    usersList.innerHTML = data.authorized_users.map(user => 
+                        `<div style="padding: 10px; background: white; margin: 5px 0; border-radius: 5px;">
+                            ${user}
+                        </div>`
+                    ).join('');
+                    
+                    document.getElementById('followers-count').textContent = data.total_authorized;
+                }
+            } catch (error) {
+                console.error('Error cargando usuarios autorizados:', error);
+            }
+        }
+        
+        async function addUser() {
+            const email = document.getElementById('new-user-email').value;
+            if (!email) return;
+            
+            try {
+                const response = await fetch('/api/admin/add-user', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        email: email, 
+                        trader_email: currentUser.email 
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Usuario agregado exitosamente');
+                    document.getElementById('new-user-email').value = '';
+                    loadAuthorizedUsers();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (error) {
+                alert('Error de conexión: ' + error.message);
+            }
+        }
+        
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/status');
+                const data = await response.json();
+                
+                document.getElementById('online-users').textContent = data.users_online || 0;
+            } catch (error) {
+                console.error('Error cargando estadísticas:', error);
+            }
+        }
+        
+        // Eventos WebSocket
+        if (socket) {
+            socket.on('new_operation', function(data) {
+                console.log('Nueva operación:', data);
+                // Actualizar feed de operaciones
+                const feed = document.getElementById('operations-feed');
+                if (feed) {
+                    feed.innerHTML = '<div style="padding: 10px; background: #e8f5e8; margin: 5px 0; border-radius: 5px;">' +
+                        'Nueva operación: ' + JSON.stringify(data) + '</div>' + feed.innerHTML;
+                }
+            });
+        }
+        
+        // Cargar estadísticas cada 30 segundos
+        setInterval(loadStats, 30000);
+    </script>
+</body>
+</html>
