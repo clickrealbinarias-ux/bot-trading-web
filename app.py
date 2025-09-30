@@ -23,7 +23,7 @@ app.config['SECRET_KEY'] = 'tu_clave_secreta_aqui'
 CORS(app)
 
 # Inicializar SocketIO
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
 # Base de datos simple
 DATABASE_FILE = "database/authorized_users.json"
