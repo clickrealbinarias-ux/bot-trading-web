@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metabinario</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: white;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .header-section {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        h1 {
+            color: #00d4ff;
+            font-size: 4.5rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.6);
+            font-weight: 900;
+            letter-spacing: 2px;
+        }
+        
+        .subtitle {
+            color: #b0b0b0;
+            font-size: 1.4rem;
+            margin-bottom: 40px;
+            font-weight: 300;
+        }
+        
+        .btn-login {
+            background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+            color: white;
+            border: none;
+            padding: 18px 45px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
+            transition: all 0.4s ease;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 20px;
+        }
+        
+        .btn-login:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 40px rgba(0, 212, 255, 0.6);
+            background: linear-gradient(135deg, #00b8e6 0%, #0088bb 100%);
+        }
+        
+        .btn-login:active {
+            transform: translateY(-2px);
+        }
+        
+        .sections-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+        
+        .section-card {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 20px;
+            padding: 35px;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .section-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #00d4ff, #0099cc, #00d4ff);
+            background-size: 200% 100%;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        
+        .section-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.15);
+            border-color: rgba(0, 212, 255, 0.4);
+        }
+        
+        .section-icon {
+            font-size: 3rem;
+            color: #00d4ff;
+            margin-bottom: 20px;
+            text-align: center;
+            display: block;
+        }
+        
+        .section-title {
+            color: #ffffff;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 0 2px 10px rgba(0, 212, 255, 0.3);
+        }
+        
+        .section-description {
+            color: #d0d0d0;
+            font-size: 1.1rem;
+            text-align: center;
+            line-height: 1.8;
+            margin-bottom: 25px;
+        }
+        
+        .section-features {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .section-features li {
+            color: #b0b0b0;
+            padding: 8px 0;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-features li::before {
+            content: '✓';
+            color: #00d4ff;
+            font-weight: bold;
+            margin-right: 12px;
+            font-size: 1.1rem;
+        }
+        
+        .intro-section {
+            background: linear-gradient(145deg, rgba(0, 212, 255, 0.1) 0%, rgba(0, 153, 204, 0.05) 100%);
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 25px;
+            padding: 45px;
+            margin-bottom: 50px;
+            text-align: center;
+            backdrop-filter: blur(15px);
+        }
+        
+        .intro-title {
+            color: #00d4ff;
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+        }
+        
+        .intro-text {
+            color: #e0e0e0;
+            font-size: 1.2rem;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .highlight {
+            color: #00d4ff;
+            font-weight: 600;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background: #1a1a1a;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 80%;
+            max-width: 500px;
+            border: 2px solid #333;
+        }
+        
+        .role-selection {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .role-card {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 2px solid #333;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .role-card:hover {
+            border-color: #00d4ff;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+        }
+        
+        .role-card.selected {
+            border-color: #00d4ff;
+            background: linear-gradient(135deg, #0f3460 0%, #1a1a2e 100%);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+        
+        .role-icon {
+            font-size: 3rem;
+            color: #00d4ff;
+            margin-bottom: 15px;
+        }
+        
+        .role-card h3 {
+            color: #fff;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .role-card p {
+            color: #b0b0b0;
+            margin-bottom: 20px;
+        }
+        
+        .login-form {
+            display: none;
+            margin-top: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #00d4ff;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #333;
+            border-radius: 5px;
+            background: #2a2a2a;
+            color: white;
+            font-size: 16px;
+        }
+        
+        .form-group select option {
+            background: #2a2a2a;
+            color: white;
+        }
+        
+        .btn-login {
+            background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+        
+        .dashboard {
+            display: none;
+            margin-top: 40px;
+            padding: 0;
+            background: transparent;
+            border-radius: 0;
+            border: none;
+        }
+        
+        .dashboard-header {
+            background: linear-gradient(145deg, rgba(0, 212, 255, 0.1) 0%, rgba(0, 212, 255, 0.05) 100%);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .dashboard-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #00d4ff, #0099cc, #00d4ff);
+            background-size: 200% 100%;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+        
+        .dashboard-title {
+            color: #00d4ff;
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .dashboard-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+        
+        .control-panel {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 18px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .control-panel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.1);
+            border-color: rgba(0, 212, 255, 0.3);
+        }
+        
+        .control-panel h4 {
+            color: #ffffff;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn-copytrading {
+            background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.3);
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-transform: none;
+            letter-spacing: 0.5px;
+            margin: 8px;
+            position: relative;
+            overflow: hidden;
+            min-width: 180px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-copytrading::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn-copytrading:hover::before {
+            left: 100%;
+        }
+        
+        .btn-copytrading:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
+            background: linear-gradient(135deg, #00b8e6 0%, #0088bb 100%);
+        }
+        
+        .btn-copytrading:active {
+            transform: translateY(-1px);
+        }
+        
+        .btn-copytrading.success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+        }
+        
+        .btn-copytrading.success:hover {
+            background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
+            box-shadow: 0 10px 30px rgba(40, 167, 69, 0.4);
+        }
+        
+        .btn-copytrading.danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.3);
+        }
+        
+        .btn-copytrading.danger:hover {
+            background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+            box-shadow: 0 10px 30px rgba(220, 53, 69, 0.4);
+        }
+        
+        .btn-copytrading.warning {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+            color: #212529;
+            box-shadow: 0 6px 20px rgba(255, 193, 7, 0.3);
+        }
+        
+        .btn-copytrading.warning:hover {
+            background: linear-gradient(135deg, #e0a800 0%, #d39e00 100%);
+            box-shadow: 0 10px 30px rgba(255, 193, 7, 0.4);
+        }
+        
+        .btn-copytrading.secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+            box-shadow: 0 6px 20px rgba(108, 117, 125, 0.3);
+        }
+        
+        .btn-copytrading.secondary:hover {
+            background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
+            box-shadow: 0 10px 30px rgba(108, 117, 125, 0.4);
+        }
+        
+        .btn-copytrading.info {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            box-shadow: 0 6px 20px rgba(23, 162, 184, 0.3);
+        }
+        
+        .btn-copytrading.info:hover {
+            background: linear-gradient(135deg, #138496 0%, #117a8b 100%);
+            box-shadow: 0 10px 30px rgba(23, 162, 184, 0.4);
+        }
+        
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .form-input {
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 12px;
+            padding: 12px 18px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            min-width: 250px;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+            background: rgba(0, 0, 0, 0.6);
+        }
+        
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .user-info {
+            background: linear-gradient(145deg, rgba(0, 212, 255, 0.1) 0%, rgba(0, 212, 255, 0.05) 100%);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+        }
+        
+        .user-info h4 {
+            color: #00d4ff;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .user-info p {
+            color: #e0e0e0;
+            margin: 8px 0;
+            font-size: 1rem;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+        }
+        
+        .status-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #ff4444;
+            box-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
+            animation: pulse 2s infinite;
+        }
+        
+        .status-dot.connected {
+            background: #00ff88;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .list-container {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 15px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .list-container h5 {
+            color: #00d4ff;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .list-container ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .list-container li {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 8px 0;
+            color: #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .list-container li:hover {
+            background: rgba(0, 212, 255, 0.1);
+            border-color: rgba(0, 212, 255, 0.3);
+            transform: translateX(5px);
+        }
+        
+        .remove-btn {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+        
+        .remove-btn:hover {
+            background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+            transform: scale(1.05);
+        }
+        
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff4444;
+        }
+        
+        .status-dot.connected {
+            background: #00ff88;
+        }
+        
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: #00d4ff;
+        }
+        
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="header-section">
+            <h1>Metabinario</h1>
+            <p class="subtitle">Plataforma profesional de trading y copytrading</p>
+            <button class="btn-login" onclick="showCopytradingAccess()">
+                Iniciar Sesión
+            </button>
+        </div>
+
+        <!-- Sección de Introducción -->
+        <div class="intro-section">
+            <div class="intro-title">¿Por qué Metabinario?</div>
+            <div class="intro-text">
+                En <span class="highlight">Metabinario</span>, revolucionamos el trading con una filosofía única: 
+                <strong>transparencia total, educación real y resultados medibles</strong>. 
+                No somos solo otra plataforma de trading; somos tu socio estratégico en el camino hacia 
+                la independencia financiera. Nuestro enfoque combina <span class="highlight">análisis técnico avanzado</span>, 
+                <span class="highlight">psicología del trading</span> y <span class="highlight">manipulación de mercados</span> 
+                para ofrecerte una ventaja competitiva real en los mercados financieros.
+            </div>
+        </div>
+
+        <!-- Secciones de Servicios -->
+        <div class="sections-container">
+            <!-- Sección de Clases -->
+            <div class="section-card">
+                <span class="section-icon">🎓</span>
+                <div class="section-title">Clases en Vivo</div>
+                <div class="section-description">
+                    Formación intensiva con nuestros expertos en sesiones interactivas y supervisión personalizada.
+                </div>
+                <ul class="section-features">
+                    <li>Cinco días a la semana de clases</li>
+                    <li>Dos clases diarias de 2 horas cada una</li>
+                    <li>Compartir pantalla para seguimiento de operativas</li>
+                    <li>Micrófono abierto para participación activa</li>
+                    <li>Supervisión directa de tus operaciones</li>
+                </ul>
+            </div>
+
+            <!-- Sección de Operativas VIP -->
+            <div class="section-card">
+                <span class="section-icon">👑</span>
+                <div class="section-title">Operativas VIP</div>
+                <div class="section-description">
+                    Accede a operativas exclusivas con manipulación estratégica de mercados.
+                </div>
+                <ul class="section-features">
+                    <li>Manipulación estratégica de precios</li>
+                    <li>Enfoque diferente al mercado tradicional</li>
+                    <li>Acceso a información privilegiada</li>
+                    <li>Estrategias de alto rendimiento</li>
+                    <li>Resultados verificables y consistentes</li>
+                </ul>
+            </div>
+
+            <!-- Sección de Copytrading -->
+            <div class="section-card">
+                <span class="section-icon">🤖</span>
+                <div class="section-title">Copytrading Automático</div>
+                <div class="section-description">
+                    Replica automáticamente las operaciones de nuestros traders más exitosos.
+                </div>
+                <ul class="section-features">
+                    <li>Replicación automática de operaciones</li>
+                    <li>Múltiples traders profesionales</li>
+                    <li>Control total de tu capital</li>
+                    <li>Estadísticas en tiempo real</li>
+                    <li>Sistema 100% automatizado</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="status" id="status" style="display: none;">
+            Haz clic en el botón para acceder al sistema de copytrading
+        </div>
+        
+        <div class="dashboard" id="dashboard" style="display: none;">
+            <!-- Header del Dashboard -->
+            <div class="dashboard-header">
+                <div class="dashboard-title">
+                    <span>📊</span>
+                    <span>Dashboard de Copytrading</span>
+                </div>
+                <div class="status-indicator">
+                    <div class="status-dot" id="connectionDot"></div>
+                    <span id="connectionText">Desconectado</span>
+                </div>
+            </div>
+            
+            <!-- Contenido del Dashboard -->
+            <div class="dashboard-content">
+                <!-- Información del Usuario -->
+                <div class="user-info" id="userInfo" style="display: none;">
+                    <h4>👤 Información del Usuario</h4>
+                    <div id="userDetails"></div>
+                </div>
+                
+                <!-- Panel de Control Principal -->
+                <div class="control-panel">
+                    <h4>🎮 Control Principal</h4>
+                    <div class="btn-group">
+                        <button class="btn-copytrading" onclick="startCopytrading()" id="startBtn">
+                            ▶️ Iniciar Copytrading
+                        </button>
+                        
+                        <button class="btn-copytrading success" onclick="showAmountModal(currentUser.email)" id="amountBtn" style="display: none;">
+                            💰 Configurar Importe
+                        </button>
+                        
+                        <button class="btn-copytrading success" onclick="startFollowerBot()" id="startFollowerBtn" style="display: none;">
+                            ▶️ Encender Mi Bot
+                        </button>
+                        
+                        <button class="btn-copytrading danger" onclick="stopFollowerBot()" id="stopFollowerBtn" style="display: none;">
+                            ⏸️ Apagar Mi Bot
+                        </button>
+                        
+                        <button class="btn-copytrading secondary" onclick="disconnectFollower()" id="disconnectBtn" style="display: none;">
+                            🛑 Desconectar
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Panel de Administración para el Trader -->
+                <div class="control-panel" id="adminSection" style="display: none;">
+                    <h4>🔐 Administración de Usuarios</h4>
+                    
+                    <div class="input-group">
+                        <input type="email" id="newUserEmail" placeholder="Email del nuevo usuario" class="form-input">
+                        <button class="btn-copytrading success" onclick="addAuthorizedUser()">
+                            ➕ Agregar Usuario
+                        </button>
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button class="btn-copytrading info" onclick="loadAuthorizedUsers()">
+                            📋 Ver Usuarios Autorizados
+                        </button>
+                    </div>
+                    
+                    <div class="list-container" id="authorizedUsersList" style="display: none;">
+                        <h5>Usuarios Autorizados:</h5>
+                        <ul id="usersList"></ul>
+                    </div>
+                </div>
+                
+                <!-- Panel de Navegación para el Seguidor -->
+                <div class="control-panel" id="followerNavigation" style="display: none;">
+                    <h4>🧭 Navegación</h4>
+                    <div class="btn-group">
+                        <button class="btn-copytrading secondary" onclick="goToHome()">
+                            🏠 Volver al Inicio
+                        </button>
+                        <button class="btn-copytrading danger" onclick="logout()">
+                            🚪 Cerrar Sesión
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Panel de Navegación para el Trader -->
+                <div class="control-panel" id="traderNavigation" style="display: none;">
+                    <h4>🧭 Navegación</h4>
+                    <div class="btn-group">
+                        <button class="btn-copytrading secondary" onclick="goToHome()">
+                            🏠 Volver al Inicio
+                        </button>
+                        <button class="btn-copytrading danger" onclick="logout()">
+                            🚪 Cerrar Sesión
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+                
+    <!-- Modal de Selección de Rol -->
+    <div id="roleModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('roleModal')">&times;</span>
+            <h2>🤖 Acceder al Copytrading</h2>
+            <p>Selecciona tu rol para acceder al sistema:</p>
+            
+            <div class="role-selection">
+                <div class="role-card" onclick="selectRole('trader')">
+                    <div class="role-icon">📈</div>
+                    <h3>Trader Principal</h3>
+                    <p>Eres un trader profesional que quiere que otros copien tus operaciones</p>
+                </div>
+                
+                <div class="role-card" onclick="selectRole('follower')">
+                    <div class="role-icon">👥</div>
+                    <h3>Seguidor</h3>
+                    <p>Quieres copiar automáticamente las operaciones de traders exitosos</p>
+                </div>
+            </div>
+            
+            <div class="login-form" id="loginForm">
+                <h3>Iniciar Sesión</h3>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" placeholder="tu@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="password">Contraseña:</label>
+                    <input type="password" id="password" placeholder="Tu contraseña">
+                </div>
+                <div class="form-group">
+                    <label for="balanceMode">Modo de Trading:</label>
+                    <select id="balanceMode" required>
+                        <option value="PRACTICE">🎯 DEMO (Práctica)</option>
+                        <option value="REAL">💰 REAL (Dinero Real)</option>
+                    </select>
+                </div>
+                <button class="btn-login" onclick="login()" id="loginBtn">Iniciar Sesión</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Configuración de Importe -->
+    <div id="amountModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('amountModal')">&times;</span>
+            <h2>💰 Configurar Importe</h2>
+            <p>Configura el importe que quieres usar por operación:</p>
+            
+            <div class="form-group">
+                <label for="followerAmount">Importe por operación ($):</label>
+                <input type="number" id="followerAmount" placeholder="10.0" min="1" step="0.1" value="10.0">
+            </div>
+            
+            <div class="form-group">
+                <label for="followerEmail">Email del seguidor:</label>
+                <input type="email" id="followerEmail" placeholder="seguidor@email.com" readonly>
+                </div>
+                
+            <button class="btn-login" onclick="updateFollowerAmount()" id="updateAmountBtn">
+                💰 Actualizar Importe
+            </button>
+                    </div>
+                </div>
+                
+    <script>
+        const API_BASE_URL = 'http://localhost:5004/api';
+        let selectedRole = null;
+        let isLoggedIn = false;
+        let currentUser = null;
+        let authToken = null;
+        let socket = null;
+
+        // Inicializar WebSocket
+        function initWebSocket() {
+            if (socket) {
+                socket.disconnect();
+            }
+            
+            socket = io('http://localhost:5004');
+            
+            socket.on('connect', function() {
+                console.log('🔌 Conectado al servidor WebSocket');
+            });
+            
+            socket.on('disconnect', function() {
+                console.log('🔌 Desconectado del servidor WebSocket');
+            });
+            
+            // Eventos de notificación
+            socket.on('trader_connected', function(data) {
+                console.log('✅ Trader conectado:', data);
+                showNotification('Trader conectado exitosamente', 'success');
+            });
+            
+            socket.on('follower_connected', function(data) {
+                console.log('✅ Seguidor conectado:', data);
+                showNotification('Seguidor conectado exitosamente', 'success');
+            });
+            
+            socket.on('auto_copy_activated', function(data) {
+                console.log('🤖 Copytrading automático activado:', data);
+                showNotification('Copytrading automático activado', 'success');
+            });
+            
+            socket.on('auto_copy_stopped', function(data) {
+                console.log('⏸️ Copytrading automático detenido:', data);
+                showNotification('Copytrading automático detenido', 'info');
+            });
+            
+            socket.on('copytrading_result', function(data) {
+                console.log('📊 Resultado de copytrading:', data);
+                showNotification('Operación de copytrading ejecutada', 'info');
+            });
+        }
+
+        function showNotification(message, type = 'info') {
+            // Crear elemento de notificación
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <span>${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()">×</button>
+                </div>
+            `;
+            
+            // Estilos para la notificación
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#4caf50' : type === 'error' ? '#f44336' : '#2196f3'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                z-index: 10000;
+                max-width: 300px;
+                animation: slideIn 0.3s ease;
+            `;
+            
+            // Agregar estilos de animación si no existen
+            if (!document.getElementById('notification-styles')) {
+                const style = document.createElement('style');
+                style.id = 'notification-styles';
+                style.textContent = `
+                    @keyframes slideIn {
+                        from { transform: translateX(100%); opacity: 0; }
+                        to { transform: translateX(0); opacity: 1; }
+                    }
+                    .notification-content {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    }
+                    .notification-content button {
+                        background: none;
+                        border: none;
+                        color: white;
+                        font-size: 18px;
+                        cursor: pointer;
+                        margin-left: 10px;
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remover después de 5 segundos
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
+        function showCopytradingAccess() {
+            document.getElementById('roleModal').style.display = 'block';
+            document.getElementById('loginForm').style.display = 'none';
+        }
+
+        function selectRole(role) {
+            selectedRole = role;
+            
+            // Remover selección anterior
+            document.querySelectorAll('.role-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Seleccionar rol actual
+            event.target.closest('.role-card').classList.add('selected');
+            
+            // Mostrar formulario de login
+            document.getElementById('loginForm').style.display = 'block';
+        }
+
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const balanceMode = document.getElementById('balanceMode').value;
+            
+            if (!email || !password) {
+                alert('Por favor completa todos los campos');
+                return;
+            }
+            
+            const loginBtn = document.getElementById('loginBtn');
+            loginBtn.classList.add('loading');
+            loginBtn.textContent = 'Conectando...';
+            
+            try {
+                // Intentar login con el backend
+                const response = await fetch(`${API_BASE_URL}/login`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password,
+                        role: selectedRole,
+                        balance_mode: balanceMode,
+                        amount: 10.0
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentUser = {
+                        email: email,
+                        role: selectedRole,
+                        name: email.split('@')[0],
+                        user_id: data.user_id
+                    };
+                    
+                    isLoggedIn = true;
+                    
+                    // Inicializar WebSocket
+                    initWebSocket();
+                    
+                    // Cerrar modal
+                    closeModal('roleModal');
+                    
+                    // Mostrar dashboard
+                    showDashboard();
+                    
+                    // Mostrar mensaje de éxito
+                    document.getElementById('status').innerHTML = '✅ Conectado exitosamente con ExNova';
+                    document.getElementById('connectionDot').classList.add('connected');
+                    document.getElementById('connectionText').textContent = 'Conectado con ExNova';
+                } else {
+                    alert('Error de login: ' + (data.error || 'Credenciales incorrectas'));
+                }
+            } catch (error) {
+                console.error('Error de login:', error);
+                alert('Error de conexión con el servidor');
+            } finally {
+                loginBtn.classList.remove('loading');
+                loginBtn.textContent = 'Iniciar Sesión';
+            }
+        }
+
+
+        function showDashboard() {
+            // Ocultar la página principal
+            document.querySelector('.header-section').style.display = 'none';
+            document.querySelector('.intro-section').style.display = 'none';
+            document.querySelector('.sections-container').style.display = 'none';
+            
+            // Mostrar el dashboard
+            document.getElementById('dashboard').style.display = 'block';
+            
+            // Mostrar información del usuario
+            document.getElementById('userInfo').style.display = 'block';
+            document.getElementById('userDetails').innerHTML = `
+                <p><strong>Usuario:</strong> ${currentUser.name} (${currentUser.role === 'trader' ? 'Trader' : 'Seguidor'})</p>
+                <p><strong>Email:</strong> ${currentUser.email}</p>
+            `;
+            
+            // Mostrar botones según el rol
+            if (currentUser.role === 'follower') {
+                document.getElementById('amountBtn').style.display = 'inline-flex';
+                document.getElementById('startFollowerBtn').style.display = 'inline-flex';
+                document.getElementById('stopFollowerBtn').style.display = 'none';
+                document.getElementById('disconnectBtn').style.display = 'inline-flex';
+                document.getElementById('adminSection').style.display = 'none';
+                document.getElementById('traderNavigation').style.display = 'none';
+                document.getElementById('followerNavigation').style.display = 'block';
+                // Obtener estado actual del bot del seguidor
+                getFollowerBotStatus();
+            } else if (currentUser.role === 'trader') {
+                document.getElementById('amountBtn').style.display = 'none';
+                document.getElementById('startFollowerBtn').style.display = 'none';
+                document.getElementById('stopFollowerBtn').style.display = 'none';
+                document.getElementById('disconnectBtn').style.display = 'inline-flex';
+                document.getElementById('adminSection').style.display = 'block';
+                document.getElementById('traderNavigation').style.display = 'block';
+                document.getElementById('followerNavigation').style.display = 'none';
+                // Cargar usuarios autorizados al iniciar
+                loadAuthorizedUsers();
+            } else {
+                document.getElementById('amountBtn').style.display = 'none';
+                document.getElementById('startFollowerBtn').style.display = 'none';
+                document.getElementById('stopFollowerBtn').style.display = 'none';
+                document.getElementById('disconnectBtn').style.display = 'none';
+                document.getElementById('adminSection').style.display = 'none';
+                document.getElementById('traderNavigation').style.display = 'none';
+                document.getElementById('followerNavigation').style.display = 'none';
+            }
+        }
+
+        async function startCopytrading() {
+            if (!isLoggedIn) {
+                alert('Debes iniciar sesión primero');
+                return;
+            }
+            
+            if (currentUser.role !== 'trader') {
+                alert('Solo los traders pueden iniciar el copytrading automático');
+                return;
+            }
+            
+            const startBtn = document.getElementById('startBtn');
+            startBtn.classList.add('loading');
+            startBtn.innerHTML = '⏳ Iniciando...';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/trader/start-auto-copy`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: currentUser.email
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    startBtn.innerHTML = '⏸️ Detener Copytrading';
+                    startBtn.onclick = stopCopytrading;
+                    startBtn.classList.remove('loading');
+                    
+                    document.getElementById('status').innerHTML = `🚀 Copytrading automático iniciado - ${data.followers_count} seguidores conectados`;
+                } else {
+                    alert('Error iniciando copytrading: ' + data.error);
+                    startBtn.classList.remove('loading');
+                }
+            } catch (error) {
+                console.error('Error iniciando copytrading:', error);
+                alert('Error de conexión con el servidor');
+                startBtn.classList.remove('loading');
+            }
+        }
+
+        async function stopCopytrading() {
+            const startBtn = document.getElementById('startBtn');
+            startBtn.classList.add('loading');
+            startBtn.innerHTML = '⏳ Deteniendo...';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/trader/stop-auto-copy`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: currentUser.email
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    startBtn.innerHTML = '▶️ Iniciar Copytrading';
+                    startBtn.onclick = startCopytrading;
+                    startBtn.classList.remove('loading');
+                    
+                    document.getElementById('status').innerHTML = '⏹️ Copytrading automático detenido';
+                } else {
+                    alert('Error deteniendo copytrading: ' + data.error);
+                    startBtn.classList.remove('loading');
+                }
+            } catch (error) {
+                console.error('Error deteniendo copytrading:', error);
+                alert('Error de conexión con el servidor');
+                startBtn.classList.remove('loading');
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function disconnectFollower() {
+            // Limpiar variables de sesión
+            isLoggedIn = false;
+            currentUser = null;
+            
+            // Mostrar página principal
+            document.querySelector('.header-section').style.display = 'block';
+            document.querySelector('.intro-section').style.display = 'block';
+            document.querySelector('.sections-container').style.display = 'grid';
+            
+            // Ocultar dashboard
+            document.getElementById('dashboard').style.display = 'none';
+            
+            // Resetear estado
+            document.getElementById('status').style.display = 'none';
+            document.getElementById('connectionDot').classList.remove('connected');
+            document.getElementById('connectionText').textContent = 'Desconectado';
+            
+            alert('✅ Desconectado exitosamente');
+        }
+
+        function showAmountModal(email) {
+            document.getElementById('followerEmail').value = email;
+            document.getElementById('amountModal').style.display = 'block';
+        }
+
+        async function updateFollowerAmount() {
+            const email = document.getElementById('followerEmail').value;
+            const amount = parseFloat(document.getElementById('followerAmount').value);
+            
+            if (!email || !amount || amount <= 0) {
+                alert('Por favor ingresa un importe válido');
+                return;
+            }
+            
+            const updateBtn = document.getElementById('updateAmountBtn');
+            updateBtn.classList.add('loading');
+            updateBtn.textContent = '⏳ Actualizando...';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/follower/update-amount`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: currentUser.email,
+                        amount: amount
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert(`✅ Importe actualizado a $${amount}`);
+                    closeModal('amountModal');
+                } else {
+                    alert('Error actualizando importe: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error actualizando importe:', error);
+                alert('Error de conexión con el servidor');
+            } finally {
+                updateBtn.classList.remove('loading');
+                updateBtn.textContent = '💰 Actualizar Importe';
+            }
+        }
+
+        // Funciones para control de bot del seguidor
+        async function startFollowerBot() {
+            if (!isLoggedIn || currentUser.role !== 'follower') {
+                alert('Solo los seguidores pueden encender su bot');
+                return;
+            }
+            
+            const startBtn = document.getElementById('startFollowerBtn');
+            startBtn.classList.add('loading');
+            startBtn.textContent = '⏳ Encendiendo...';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/follower/start-bot`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: currentUser.email
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('✅ Bot encendido exitosamente - Ahora recibirás operaciones del trader');
+                    updateFollowerBotUI(true);
+                } else {
+                    alert('Error encendiendo bot: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error encendiendo bot:', error);
+                alert('Error de conexión con el servidor');
+            } finally {
+                startBtn.classList.remove('loading');
+                startBtn.textContent = '▶️ Encender Mi Bot';
+            }
+        }
+
+        async function stopFollowerBot() {
+            if (!isLoggedIn || currentUser.role !== 'follower') {
+                alert('Solo los seguidores pueden apagar su bot');
+                return;
+            }
+            
+            if (!confirm('¿Estás seguro de que quieres apagar tu bot? Dejarás de recibir operaciones del trader.')) {
+                return;
+            }
+            
+            const stopBtn = document.getElementById('stopFollowerBtn');
+            stopBtn.classList.add('loading');
+            stopBtn.textContent = '⏳ Apagando...';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/follower/stop-bot`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: currentUser.email
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('⏸️ Bot apagado - Ya no recibirás operaciones del trader');
+                    updateFollowerBotUI(false);
+                } else {
+                    alert('Error apagando bot: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error apagando bot:', error);
+                alert('Error de conexión con el servidor');
+            } finally {
+                stopBtn.classList.remove('loading');
+                stopBtn.textContent = '⏸️ Apagar Mi Bot';
+            }
+        }
+
+        function updateFollowerBotUI(botStatus) {
+            const startBtn = document.getElementById('startFollowerBtn');
+            const stopBtn = document.getElementById('stopFollowerBtn');
+            
+            if (botStatus) {
+                startBtn.style.display = 'none';
+                stopBtn.style.display = 'inline-block';
+            } else {
+                startBtn.style.display = 'inline-block';
+                stopBtn.style.display = 'none';
+            }
+        }
+
+        async function getFollowerBotStatus() {
+            if (!isLoggedIn || currentUser.role !== 'follower') {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/follower/bot-status?email=${encodeURIComponent(currentUser.email)}`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Estado del bot del seguidor:', data);
+                    
+                    if (data.success) {
+                        updateFollowerBotUI(data.bot_status);
+                    } else {
+                        console.warn('No se pudo obtener el estado del bot:', data.error);
+                        // Por defecto, mostrar botón de encender
+                        updateFollowerBotUI(false);
+                    }
+                } else {
+                    console.error('Error obteniendo estado del bot:', response.status);
+                    updateFollowerBotUI(false);
+                }
+            } catch (error) {
+                console.error('Error obteniendo estado del bot:', error);
+                updateFollowerBotUI(false);
+            }
+        }
+
+        // Cerrar modal al hacer clic fuera
+        window.onclick = function(event) {
+            const roleModal = document.getElementById('roleModal');
+            const amountModal = document.getElementById('amountModal');
+            
+            if (event.target === roleModal) {
+                closeModal('roleModal');
+            } else if (event.target === amountModal) {
+                closeModal('amountModal');
+            }
+        }
+
+        // Funciones de administración de usuarios
+        async function addAuthorizedUser() {
+            const email = document.getElementById('newUserEmail').value.trim();
+            if (!email) {
+                alert('Por favor ingresa un email válido');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/admin/add-user`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        trader_email: currentUser.email
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    alert('✅ Usuario agregado exitosamente');
+                    document.getElementById('newUserEmail').value = '';
+                    loadAuthorizedUsers(); // Recargar la lista
+                } else {
+                    alert('❌ Error: ' + (data.error || 'No se pudo agregar el usuario'));
+                }
+            } catch (error) {
+                console.error('Error agregando usuario:', error);
+                alert('❌ Error de conexión con el servidor');
+            }
+        }
+
+        async function loadAuthorizedUsers() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/admin/authorized-users?email=${currentUser.email}`, {
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    const usersList = document.getElementById('usersList');
+                    const authorizedUsersList = document.getElementById('authorizedUsersList');
+                    
+                    usersList.innerHTML = '';
+                    
+                    if (data.authorized_users && data.authorized_users.length > 0) {
+                        data.authorized_users.forEach(user => {
+                            const li = document.createElement('li');
+                            li.innerHTML = `
+                                <span>${user}</span>
+                                <button class="remove-btn" onclick="removeAuthorizedUser('${user}')">
+                                    🗑️ Eliminar
+                                </button>
+                            `;
+                            usersList.appendChild(li);
+                        });
+                        authorizedUsersList.style.display = 'block';
+                    } else {
+                        usersList.innerHTML = '<li style="padding: 12px 16px; color: #888; text-align: center; font-style: italic;">No hay usuarios autorizados</li>';
+                        authorizedUsersList.style.display = 'block';
+                    }
+                } else {
+                    alert('❌ Error cargando usuarios: ' + (data.error || 'Error desconocido'));
+                }
+            } catch (error) {
+                console.error('Error cargando usuarios:', error);
+                alert('❌ Error de conexión con el servidor');
+            }
+        }
+
+        async function removeAuthorizedUser(email) {
+            if (!confirm(`¿Estás seguro de que quieres eliminar a ${email} de la lista de usuarios autorizados?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/admin/remove-user`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        trader_email: currentUser.email
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    alert('✅ Usuario eliminado exitosamente');
+                    loadAuthorizedUsers(); // Recargar la lista
+                } else {
+                    alert('❌ Error: ' + (data.error || 'No se pudo eliminar el usuario'));
+                }
+            } catch (error) {
+                console.error('Error eliminando usuario:', error);
+                alert('❌ Error de conexión con el servidor');
+            }
+        }
+
+        // Funciones de navegación
+        function goToHome() {
+            // Limpiar la sesión actual
+            isLoggedIn = false;
+            currentUser = null;
+            
+            // Ocultar dashboard y mostrar página principal
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('status').style.display = 'block';
+            document.getElementById('status').textContent = 'Haz clic en el botón para acceder al sistema de copytrading';
+            
+            // Limpiar información del usuario
+            document.getElementById('userInfo').innerHTML = '';
+            
+            // Ocultar todos los botones
+            document.getElementById('amountBtn').style.display = 'none';
+            document.getElementById('startFollowerBtn').style.display = 'none';
+            document.getElementById('stopFollowerBtn').style.display = 'none';
+            document.getElementById('disconnectBtn').style.display = 'none';
+            document.getElementById('adminSection').style.display = 'none';
+            document.getElementById('traderNavigation').style.display = 'none';
+            document.getElementById('followerNavigation').style.display = 'none';
+            
+            // Mostrar botón de inicio
+            document.getElementById('startBtn').style.display = 'inline-block';
+            
+            // Desconectar del socket si está conectado
+            if (socket) {
+                socket.disconnect();
+                socket = null;
+            }
+            
+            console.log('🏠 Regresando a la página principal');
+        }
+
+        function logout() {
+            // Confirmar cierre de sesión
+            if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+                // Limpiar la sesión actual
+                isLoggedIn = false;
+                currentUser = null;
+                
+                // Ocultar dashboard y mostrar página principal
+                document.getElementById('dashboard').style.display = 'none';
+                document.getElementById('status').style.display = 'block';
+                document.getElementById('status').textContent = 'Haz clic en el botón para acceder al sistema de copytrading';
+                
+                // Limpiar información del usuario
+                document.getElementById('userInfo').innerHTML = '';
+                
+                // Ocultar todos los botones
+                document.getElementById('amountBtn').style.display = 'none';
+                document.getElementById('startFollowerBtn').style.display = 'none';
+                document.getElementById('stopFollowerBtn').style.display = 'none';
+                document.getElementById('disconnectBtn').style.display = 'none';
+                document.getElementById('adminSection').style.display = 'none';
+                document.getElementById('traderNavigation').style.display = 'none';
+                document.getElementById('followerNavigation').style.display = 'none';
+                
+                // Mostrar botón de inicio
+                document.getElementById('startBtn').style.display = 'inline-block';
+                
+                // Desconectar del socket si está conectado
+                if (socket) {
+                    socket.disconnect();
+                    socket = null;
+                }
+                
+                console.log('🚪 Sesión cerrada exitosamente');
+                alert('✅ Sesión cerrada exitosamente');
+            }
+        }
+    </script>
+</body>
+</html>

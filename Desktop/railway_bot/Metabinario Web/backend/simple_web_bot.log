@@ -1,0 +1,25 @@
+2025-09-27 23:38:01,198 - INFO - 🚀 Iniciando Simple Web Bot...
+2025-09-27 23:38:01,198 - INFO - 📊 Sistema de Copytrading Web Simplificado
+2025-09-27 23:38:01,199 - INFO - 🌐 Sin procesos independientes
+2025-09-27 23:38:01,199 - INFO - 🔗 API REST + WebSocket
+2025-09-27 23:38:01,199 - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-09-27 23:38:18,409 - INFO - 🚀 Iniciando Simple Web Bot...
+2025-09-27 23:38:18,409 - INFO - 📊 Sistema de Copytrading Web Simplificado
+2025-09-27 23:38:18,409 - INFO - 🌐 Sin procesos independientes
+2025-09-27 23:38:18,409 - INFO - 🔗 API REST + WebSocket
+2025-09-27 23:38:18,409 - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-09-27 23:38:25,439 - INFO - 🚀 Iniciando Simple Web Bot...
+2025-09-27 23:38:25,440 - INFO - 📊 Sistema de Copytrading Web Simplificado
+2025-09-27 23:38:25,440 - INFO - 🌐 Sin procesos independientes
+2025-09-27 23:38:25,440 - INFO - 🔗 API REST + WebSocket
+2025-09-27 23:38:25,440 - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-09-27 23:38:25,450 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://192.168.100.202:5005
+2025-09-27 23:38:25,450 - INFO - [33mPress CTRL+C to quit[0m
+2025-09-27 23:38:30,550 - INFO - 127.0.0.1 - - [27/Sep/2025 23:38:30] "GET /api/status HTTP/1.1" 200 -
+2025-09-27 23:38:32,955 - INFO - 🔗 Conectando trader: binariosector91@outlook.com
+2025-09-27 23:38:33,632 - INFO - Websocket connected
+2025-09-27 23:38:34,423 - ERROR - error from callback <bound method WebsocketClient.on_close of <exnovaapi.ws.client.WebsocketClient object at 0x108226510>>: WebsocketClient.on_close() takes from 1 to 3 positional arguments but 4 were given
+2025-09-27 23:38:34,423 - ERROR - WebsocketClient.on_close() takes from 1 to 3 positional arguments but 4 were given

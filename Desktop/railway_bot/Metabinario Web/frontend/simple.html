@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metabinario - Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a1a;
+            color: white;
+            margin: 0;
+            padding: 50px;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: #00d4ff;
+            margin-bottom: 30px;
+        }
+        
+        .btn-copytrading {
+            background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 20px;
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-copytrading:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.5);
+        }
+        
+        .status {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(0, 212, 255, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 Metabinario - Test</h1>
+        <p>Página de prueba para verificar el botón de copytrading</p>
+        
+        <button class="btn-copytrading" onclick="testCopytrading()">
+            🤖 ACCEDER AL COPYTRADING
+        </button>
+        
+        <div class="status" id="status">
+            Haz clic en el botón para probar
+        </div>
+    </div>
+
+    <script>
+        function testCopytrading() {
+            document.getElementById('status').innerHTML = '✅ ¡Botón funcionando! El copytrading está listo.';
+            document.getElementById('status').style.background = 'rgba(0, 255, 136, 0.1)';
+            document.getElementById('status').style.borderColor = 'rgba(0, 255, 136, 0.3)';
+        }
+    </script>
+</body>
+</html>
