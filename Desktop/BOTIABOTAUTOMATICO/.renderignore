@@ -1,0 +1,10 @@
+venv/
+.env
+*.pyc
+__pycache__/
+.git/
+.DS_Store
+backup/
+GoogleColabBot.zip
+COPY_TRADING_BOT_BACKUP_*.tar.gz
+flask_session/
